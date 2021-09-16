@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using PlatformService.Data;
 using PlatformService.Dtos;
 using PlatformService.Models;
+using PlatformService.SyncDataServices.Http;
 
 namespace PlatformService.Controllers
 {
@@ -14,11 +16,16 @@ namespace PlatformService.Controllers
     {
         private IPlatformRepo _platformRepo;
         private IMapper _mapper;
+        private ICommandDataClient _commandDataClient;
 
-        public PlatformController(IPlatformRepo platformRepo, IMapper mapper)
+        public PlatformController(
+            IPlatformRepo platformRepo, 
+            IMapper mapper,
+            ICommandDataClient commandDataClient)
         {
             _platformRepo = platformRepo;
             _mapper = mapper;
+            _commandDataClient = commandDataClient;
         }
 
         [HttpGet]
@@ -40,13 +47,24 @@ namespace PlatformService.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(PlatformCreateDto platform)
+        public async Task<IActionResult> Create(PlatformCreateDto platform)
         {
             var model = _mapper.Map<Platform>(platform);
             _platformRepo.Create(model);
             _platformRepo.SaveChanges();
 
-            return CreatedAtAction(nameof(GetById), new {id = model.Id}, _mapper.Map<PlatformReadDto>(model));
+            var dto = _mapper.Map<PlatformReadDto>(model);
+
+            try
+            {
+                await _commandDataClient.SendPlatformToCommand(dto);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"--> Cound not send synchronously: {ex.Message}");
+            }
+
+            return CreatedAtAction(nameof(GetById), new {id = model.Id}, dto);
         }
     }
 }
