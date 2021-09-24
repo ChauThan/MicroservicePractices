@@ -64,12 +64,11 @@ namespace PlatformService.AsyncDataServices
                 _channel.Close();
                 _connection.Close();
             }
-
         }
 
         private void SendMessage(string message)
         {
-            var body = Encoding.Unicode.GetBytes(message);
+            var body = Encoding.UTF8.GetBytes(message);
 
             _channel.BasicPublish("trigger", "", null, body);
 
