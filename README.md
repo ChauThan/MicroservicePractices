@@ -1,32 +1,30 @@
-## Stop Pods
+# Microservice Practices.
+
+
+## Prerequisite:
+- VSCode or Visual Studio
+- .NET Core SDK 5
+- Docker
+- Kubernetes
+
+## Build Docker image
+Before start containers, we have to create docker images for our services.
+- Open terminal and set current directory to platform folder.
 ```ps
-kubectl scale deploy commands-depl --replicas=0
-kubectl scale deploy platforms-depl --replicas=0
+docker build -t chauthan\platformservice .
+```
+- Then go to command folder.
+```ps
+docker build -t chauthan\commandservice .
 ```
 
-## Start Pods
+## Deploy to K8S
+In source folder, apply all yaml files.
 ```ps
-kubectl scale deploy commands-depl --replicas=1
-kubectl scale deploy platforms-depl --replicas=1
+kubectl apply -f .\K8S\
 ```
+These resources are deployed under `microservice-practice` namespace. You can use below command to remove all resources.
 
-## Delete Ingress nginx
-- Delete deployments
 ```ps
-kubectl delete deploy ingress-nginx-controller -n ingress-nginx
-```
-- Delete pods
-```ps
-kubectl get pods -A
-kubectl delete pods <id> -n ingress-nginx
-```
-- Delete services
-```ps
-kubectl get services -A
-kubectl delete services <id> -n ingress-nginx
-```
-- Delete jobs
-```ps
-kubectl get jobs -A
-kubectl delete jobs <id> -n ingress-nginx
+kubectl delete pvc,svc,secret,deploy --all -n microservice-practice
 ```
