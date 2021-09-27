@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: commands-depl
+  namespace: microservice-practice
 spec:
   replicas: 1
   selector:
@@ -21,6 +22,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: commands-clusterid-srv
+  namespace: microservice-practice
 spec:
   type: ClusterIP
   selector:
