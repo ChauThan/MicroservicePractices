@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mssql-depl
+  namespace: microservice-practice
 spec:
   replicas: 1
   selector: 
@@ -39,6 +40,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mssql-clusterip-srv
+  namespace: microservice-practice
 spec:
   type: ClusterIP
   selector:
@@ -53,6 +55,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mssql-loadbalancer
+  namespace: microservice-practice
 spec:
   type: LoadBalancer
   selector:
